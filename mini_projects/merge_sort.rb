@@ -29,10 +29,10 @@ def merge(left, right)
   until left.empty? || right.empty?
     if left[0] <= right[0]
       result.push(left[0])
-      left = left.slice(1, left.length)
+      left.shift
     else
       result.push(right[0])
-      right = right.slice(1, right.length)
+      right.shift
     end
   end
 
