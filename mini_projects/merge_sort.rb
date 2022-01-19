@@ -3,9 +3,7 @@
 # https://en.wikipedia.org/wiki/Merge_sort
 
 def merge_sort(list)
-  if list.length <= 1
-    return list
-  end
+  return list if list.length <= 1
 
   left = []
   right = []
@@ -27,28 +25,24 @@ def merge(left, right)
   result = []
 
   until left.empty? || right.empty?
-    if left[0] <= right[0]
-      result.push(left[0])
+    if left.first <= right.first
+      result.push(left.first)
       left.shift
     else
-      result.push(right[0])
+      result.push(right.first)
       right.shift
     end
   end
 
   # Only one of these two will actually run
-  unless left.empty?
-    result += left
-  end
-  unless right.empty?
-    result += right
-  end
+  result += left unless left.empty?
+  result += right unless right.empty?
 
   result
 end
 
 p merge_sort([]) # => []
 p merge_sort([1]) # => [1]
-p merge_sort([2,1]) # => [1,2]
-p merge_sort([4,3,78,2,0,2]) # => [0,2,2,3,4,78]
-p merge_sort([3,2,1,0,-1,-2,-3]) # => [-3,-2,-1,0,1,2,3]
+p merge_sort([2, 1]) # => [1,2]
+p merge_sort([4, 3, 78, 2, 0, 2]) # => [0,2,2,3,4,78]
+p merge_sort([3, 2, 1, 0, -1, -2, -3]) # => [-3,-2,-1,0,1,2,3]
