@@ -150,6 +150,19 @@ class Controller
 
   private
 
+  def end_game(player1, player2)
+    case @b.detect_winner
+    when 'tie'
+      puts 'It was a tie! How boring!'
+    when player1.symbol
+      declare_winner(player1)
+    when player2.symbol
+      declare_winner(player2)
+    else
+      puts 'Something went horribly wrong.'
+    end
+  end
+
   def declare_winner(player)
     puts "#{player.name} (#{player.symbol}) has won!"
   end
@@ -167,16 +180,9 @@ class Controller
     end
 
     @b.print_board
-    if @b.detect_winner == 'tie'
-      puts 'It was a tie! How boring!'
-    elsif @b.detect_winner == @p1.symbol
-      declare_winner(@p1)
-    else
-      declare_winner(@p2)
-    end
+    end_game(@p1, @p2)
   end
 
-  # TODO
   # This could be better
   def mode2
     puts "Would you like to be #{Board::MARKS[0]} or #{Board::MARKS[1]}?"
@@ -204,26 +210,9 @@ class Controller
     end
 
     @b.print_board
-    if @b.detect_winner == 'tie'
-      puts 'It was a tie! How boring!'
-    elsif @b.detect_winner == @p.symbol
-      declare_winner(@p)
-    else
-      declare_winner(@c)
-    end
+    end_game(@p, @c)
   end
 end
 
 c = Controller.new
 c.start
-
-# b = Board.new
-# b.print_board
-# b.place('X', 3)
-# b.print_board
-# b.place('O', 3)
-# b.place('Z', 2)
-# b.place('O', 100)
-# b.print_board
-# b.place('O', 4)
-# b.print_board
