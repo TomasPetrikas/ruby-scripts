@@ -36,6 +36,8 @@ class Board
     true
   end
 
+  # Returns the symbol of the winner is someone won or 'tie' if there's a tie
+  # Returns nil otherwise
   def detect_winner
     (0..2).each do |i|
       return check_row(i) unless check_row(i).nil?
@@ -43,6 +45,7 @@ class Board
     end
 
     return check_diagonals unless check_diagonals.nil?
+    return 'tie' if check_tie
 
     nil
   end
@@ -74,6 +77,10 @@ class Board
 
     nil
   end
+
+  def check_tie
+    @board.flatten.none? { |cell| DIGITS.include?(cell) }
+  end
 end
 
 class Player
@@ -83,12 +90,36 @@ class Player
     @name = name
     @symbol = symbol
   end
+
+  def take_turn(board)
+    while true
+      board.print_board
+      print "#{@name} (#{@symbol}), enter your move (1-9): "
+      move = gets.chomp.to_i
+      puts ''
+      break if board.correct_placement?(@symbol, move - 1)
+    end
+
+    board.place(@symbol, move)
+  end
 end
 
 class ComputerPlayer < Player
-  # TODO
-  def return_move(board)
-    nil
+  def take_turn(board)
+    move = get_move(board)
+    board.place(@symbol, move)
+    puts "#{@name} placed its #{@symbol} on spot #{move}.\n\n"
+  end
+
+  private
+
+  def get_move(board)
+    while true
+      move = rand(1..9)
+      break if board.correct_placement?(@symbol, move - 1)
+    end
+
+    move
   end
 end
 
@@ -119,16 +150,8 @@ class Controller
 
   private
 
-  def take_turn(player)
-    while true
-      @b.print_board
-      print "#{player.name} (#{player.symbol}), enter your move (1-9): "
-      move = gets.chomp.to_i
-      puts ''
-      break if @b.correct_placement?(player.symbol, move - 1)
-    end
-
-    @b.place(player.symbol, move)
+  def declare_winner(player)
+    puts "#{player.name} (#{player.symbol}) has won!"
   end
 
   def mode1
@@ -136,24 +159,58 @@ class Controller
     @p2 = Player.new('Player 2', Board::MARKS[1])
 
     while true
-      take_turn(@p1)
+      @p1.take_turn(@b)
       break unless @b.detect_winner.nil?
 
-      take_turn(@p2)
+      @p2.take_turn(@b)
       break unless @b.detect_winner.nil?
     end
 
     @b.print_board
-    if @p1.symbol == @b.detect_winner
-      puts "#{@p1.name} (#{@p1.symbol}) has won!"
+    if @b.detect_winner == 'tie'
+      puts 'It was a tie! How boring!'
+    elsif @b.detect_winner == @p1.symbol
+      declare_winner(@p1)
     else
-      puts "#{@p2.name} (#{@p2.symbol}) has won!"
+      declare_winner(@p2)
     end
   end
 
   # TODO
+  # This could be better
   def mode2
+    puts "Would you like to be #{Board::MARKS[0]} or #{Board::MARKS[1]}?"
+    puts "(#{Board::MARKS[0]} gets to go first.)"
 
+    while true
+      symbol = gets.chomp.upcase
+      break if Board::MARKS.include?(symbol)
+
+      puts 'Oops, try again:'
+    end
+
+    @p = Player.new('Player', symbol)
+    @c = ComputerPlayer.new('Computer', Board::MARKS[0]) if symbol == Board::MARKS[1]
+    @c = ComputerPlayer.new('Computer', Board::MARKS[1]) if symbol == Board::MARKS[0]
+
+    while true
+      @p.take_turn(@b) if @p.symbol == Board::MARKS[0]
+      @c.take_turn(@b) if @c.symbol == Board::MARKS[0]
+      break unless @b.detect_winner.nil?
+
+      @p.take_turn(@b) if @p.symbol == Board::MARKS[1]
+      @c.take_turn(@b) if @c.symbol == Board::MARKS[1]
+      break unless @b.detect_winner.nil?
+    end
+
+    @b.print_board
+    if @b.detect_winner == 'tie'
+      puts 'It was a tie! How boring!'
+    elsif @b.detect_winner == @p.symbol
+      declare_winner(@p)
+    else
+      declare_winner(@c)
+    end
   end
 end
 
