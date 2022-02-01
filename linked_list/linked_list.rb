@@ -74,35 +74,79 @@ class LinkedList
       current_node = @head
       current_node = current_node.next_node while current_node.next_node != @tail
 
-      # p "Tail: #{tail.value} #{tail.next_node}"
-      # p "Curr: #{current_node.value} #{current_node.next_node}"
-
       @tail = current_node
       @tail.value = current_node.value
       @tail.next_node = nil
-
-      # p "Tail: #{tail.value} #{tail.next_node}"
-      # p "Curr: #{current_node.value} #{current_node.next_node}"
     end
 
     @size -= 1
     val
   end
 
+  # Returns true if value is in the list, false otherwise
   def contains?(value)
-    # TODO
+    current_node = @head
+    until current_node.nil?
+      return true if value == current_node.value
+
+      current_node = current_node.next_node
+    end
+
+    false
   end
 
+  # Returns index of node containing value or nil if not found
   def find(value)
-    # TODO
+    return nil if @size.zero?
+
+    current_node = @head
+    index = 0
+    until current_node.nil?
+      return index if value == current_node.value
+
+      current_node = current_node.next_node
+      index += 1
+    end
+
+    nil
   end
 
+  # Inserts a new node with value at a given index and returns it
+  # If index >= @size, inserts at @tail
   def insert_at(value, index)
-    # TODO
+    return if index.negative?
+    return prepend(value) if index.zero?
+    return append(value) if index >= @size
+
+    @size += 1
+
+    current_node = @head
+    (index - 1).times { current_node = current_node.next_node }
+    next_node = current_node.next_node
+
+    new_node = Node.new(value)
+    current_node.next_node = new_node
+    new_node.next_node = next_node
+    new_node
   end
 
+  # Removes node at a given index and returns its value
+  # If index >= @size, does nothing
   def remove_at(index)
-    # tODO
+    return if index.negative? || index >= @size
+    return pop if index == @size - 1
+
+    @size -= 1
+
+    current_node = @head.next_node
+    previous_node = @head
+    (index - 1).times do
+      previous_node = current_node
+      current_node = current_node.next_node
+    end
+
+    previous_node.next_node = current_node.next_node
+    current_node.value
   end
 
   def to_s
@@ -120,18 +164,29 @@ class LinkedList
   end
 end
 
+# RSpec? Never heard of it.
+# Uncomment the block below for "testing".
+
+=begin
+
 list = LinkedList.new
 puts list
 puts "List size: #{list.size}"
 puts "List head: #{list.head.value}"
 puts "List tail: #{list.tail.value}"
-puts "At index 0: #{list.at(0).value}\n\n"
+puts "At index 0: #{list.at(0).value}"
+puts "Contains 1: #{list.contains?(1)}"
+puts "Index of 1: #{list.find(1)}\n\n"
 list.append(123)
 puts list
 puts "List size: #{list.size}"
 puts "List head: #{list.head.value}"
 puts "List tail: #{list.tail.value}"
-puts "At index 0: #{list.at(0).value}\n\n"
+puts "At index 0: #{list.at(0).value}"
+puts "Contains 1: #{list.contains?(1)}"
+puts "Contains 123: #{list.contains?(123)}"
+puts "Index of 1: #{list.find(1)}"
+puts "Index of 123: #{list.find(123)}\n\n"
 list.append(456)
 puts list
 puts "List size: #{list.size}"
@@ -151,6 +206,18 @@ p "At index 2: #{list.at(2).value}"
 p "At index 3: #{list.at(3).value}"
 p "At index 4: #{list.at(4).value}"
 p "At index 10: #{list.at(10).value}"
+
+puts "Contains 1: #{list.contains?(1)}"
+puts "Contains 2: #{list.contains?(2)}"
+puts "Contains 3: #{list.contains?(3)}"
+puts "Contains 123: #{list.contains?(123)}"
+puts "Contains 456: #{list.contains?(456)}"
+
+puts "Index of 1: #{list.find(1)}"
+puts "Index of 2: #{list.find(2)}"
+puts "Index of 3: #{list.find(3)}"
+puts "Index of 123: #{list.find(123)}"
+puts "Index of 456: #{list.find(456)}"
 
 puts '---------------------------------------------------------'
 
@@ -178,4 +245,64 @@ puts list
 puts "List size: #{list.size}"
 puts "List head: #{list.head.value}"
 puts "List tail: #{list.tail.value}"
-puts "At index 2: #{list.at(2).value}\n\n"
+puts "At index 2: #{list.at(2).value}"
+puts "Contains 'a': #{list.contains?('a')}"
+puts "Contains 'b': #{list.contains?('b')}"
+puts "Contains 'c': #{list.contains?('c')}"
+puts "Contains 'd': #{list.contains?('d')}"
+puts "Contains 'e': #{list.contains?('e')}"
+puts "Index of 'a': #{list.find('a')}"
+puts "Index of 'b': #{list.find('b')}"
+puts "Index of 'c': #{list.find('c')}"
+puts "Index of 'd': #{list.find('d')}"
+puts "Index of 'e': #{list.find('e')}"
+
+puts '---------------------------------------------------------'
+
+puts list
+list.insert_at(0, 0)
+puts list
+puts "List size: #{list.size}"
+puts "List head: #{list.head.value}"
+puts "List tail: #{list.tail.value}\n\n"
+list.insert_at(1, 100)
+puts list
+puts "List size: #{list.size}"
+puts "List head: #{list.head.value}"
+puts "List tail: #{list.tail.value}\n\n"
+list.insert_at(20, 2)
+puts list
+puts "List size: #{list.size}"
+puts "List head: #{list.head.value}"
+puts "List tail: #{list.tail.value}\n\n"
+
+puts "Removed at index 2, return: #{list.remove_at(2)}"
+puts "Removed at index 2, return: #{list.remove_at(2)}"
+puts "Removed at index 2, return: #{list.remove_at(2)}"
+puts "Removed at index 2, return: #{list.remove_at(2)}"
+puts "Removed at index 2, return: #{list.remove_at(2)}"
+puts "Removed at index 2, return: #{list.remove_at(2)}"
+puts list
+puts "List size: #{list.size}"
+puts "List head: #{list.head.value}"
+puts "List tail: #{list.tail.value}\n\n"
+
+puts "Popped, return: #{list.pop}"
+puts list
+puts "List size: #{list.size}"
+puts "List head: #{list.head.value}"
+puts "List tail: #{list.tail.value}\n\n"
+
+puts "Removed at index 0, return: #{list.remove_at(0)}"
+puts list
+puts "List size: #{list.size}"
+puts "List head: #{list.head.value}"
+puts "List tail: #{list.tail.value}\n\n"
+
+puts "Popped, return: #{list.pop}"
+puts list
+puts "List size: #{list.size}"
+puts "List head: #{list.head.value}"
+puts "List tail: #{list.tail.value}\n\n"
+
+=end
